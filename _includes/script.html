@@ -1,16 +1,67 @@
 <script src="{{ site.baseurl }}/node_modules/reveal.js/js/reveal.js"></script>
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				hash: true,
-				dependencies: [
-					{ src: 'node_modules/reveal.js/plugin/markdown/marked.js' },
-					{ src: 'node_modules/reveal.js/plugin/markdown/markdown.js' },
-					{ src: 'node_modules/reveal.js/plugin/highlight/highlight.js' },
-					{ src: 'node_modules/reveal.js/plugin/notes/notes.js', async: true }
-				]
-			});
-		</script>
+<script>
+	// Optimized Reveal.js initialization with config from _config.yml
+	(function() {
+		// Enhanced configuration merging site config with defaults
+		var revealConfig = Object.assign({
+			// Default configuration
+			hash: true,
+			transition: 'slide',
+			transitionSpeed: 'default',
+			backgroundTransition: 'fade'
+		}, {
+			// Configuration from Jekyll site config
+			{% if site.reveal %}
+			{% for config in site.reveal %}
+			{{ config[0] }}: {% if config[1] == true or config[1] == false %}{{ config[1] }}{% elsif config[1] contains '"' %}{{ config[1] }}{% else %}"{{ config[1] }}"{% endif %},
+			{% endfor %}
+			{% endif %}
+		});
+
+		// Lazy load plugins for better performance
+		var plugins = [
+			{
+				src: '{{ site.baseurl }}/node_modules/reveal.js/plugin/markdown/marked.js',
+				condition: function() {
+					return !!document.querySelector('[data-markdown]');
+				}
+			},
+			{
+				src: '{{ site.baseurl }}/node_modules/reveal.js/plugin/markdown/markdown.js',
+				condition: function() {
+					return !!document.querySelector('[data-markdown]');
+				}
+			},
+			{
+				src: '{{ site.baseurl }}/node_modules/reveal.js/plugin/highlight/highlight.js',
+				async: true,
+				condition: function() {
+					return !!document.querySelector('pre code');
+				}
+			},
+			{
+				src: '{{ site.baseurl }}/node_modules/reveal.js/plugin/notes/notes.js',
+				async: true
+			}
+		];
+
+		// Load plugins conditionally to improve performance
+		revealConfig.dependencies = plugins.filter(function(plugin) {
+			return !plugin.condition || plugin.condition();
+		});
+
+		// Initialize Reveal with error handling
+		try {
+			Reveal.initialize(revealConfig);
+			console.log('Reveal.js initialized successfully');
+		} catch (error) {
+			console.error('Failed to initialize Reveal.js:', error);
+		}
+
+		// Performance monitoring
+		if (window.performance && window.performance.mark) {
+			window.performance.mark('reveal-init-end');
+		}
+	})();
+</script>

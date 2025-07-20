@@ -3,8 +3,12 @@
 
 <title>{% if post.title %}{{ post.title }} | {{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 
-<link rel="stylesheet" href="{{ site.baseurl }}/node_modules/reveal.js/css/reveal.css">
+<!-- Preload critical resources -->
+<link rel="preload" href="{{site.baseurl}}/node_modules/reveal.js/css/reveal.css" as="style">
+<link rel="preload" href="{{site.baseurl}}/node_modules/reveal.js/css/theme/moon.css" as="style">
+<link rel="preload" href="{{site.baseurl}}/node_modules/reveal.js/js/reveal.js" as="script">
 
+<!-- Core CSS - removed duplicate reveal.css loading -->
 <link rel="stylesheet" href="{{site.baseurl}}/node_modules/reveal.js/css/reset.css">
 <link rel="stylesheet" href="{{site.baseurl}}/node_modules/reveal.js/css/reveal.css">
 <link rel="stylesheet" href="{{site.baseurl}}/node_modules/reveal.js/css/theme/moon.css">
@@ -12,11 +16,33 @@
 <!-- Theme used for syntax highlighting of code -->
 <link rel="stylesheet" href="{{site.baseurl}}/node_modules/reveal.js/lib/css/monokai.css">
 
-<!-- Printing and PDF exports -->
+<!-- Service Worker Registration -->
 <script>
-	var link = document.createElement( 'link' );
-	link.rel = 'stylesheet';
-	link.type = 'text/css';
-	link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'node_modules/reveal.js/css/print/paper.css';
-	document.getElementsByTagName( 'head' )[0].appendChild( link );
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', function() {
+			navigator.serviceWorker.register('{{site.baseurl}}/sw.js')
+				.then(function(registration) {
+					console.log('ServiceWorker registration successful');
+				})
+				.catch(function(err) {
+					console.log('ServiceWorker registration failed: ', err);
+				});
+		});
+	}
+</script>
+
+<!-- Optimized print styles loading -->
+<script>
+	// Optimized print CSS loading with error handling
+	(function() {
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) 
+			? '{{site.baseurl}}/node_modules/reveal.js/css/print/pdf.css' 
+			: '{{site.baseurl}}/node_modules/reveal.js/css/print/paper.css';
+		link.onload = function() { console.log('Print styles loaded'); };
+		link.onerror = function() { console.warn('Failed to load print styles'); };
+		document.head.appendChild(link);
+	})();
 </script>
