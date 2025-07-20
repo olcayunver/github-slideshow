@@ -9,20 +9,45 @@ markdown:    kramdown
 lsi:         false
 permalink:   "/:title"
 
+# Performance optimizations
+incremental: true
+safe: false
+profile: false
+
 kramdown:
   ## for german: "sbquo,lsquo,bdquo,ldquo"
   smart_quotes: lsquo,rsquo,ldquo,rdquo
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    span:
+      line_numbers: false
 
 plugins:
   - jemoji
+  - jekyll-sitemap
+  - jekyll-compress-html
 
 ## personalize your slide show
 title:       github-slideshow
 author:      GitHubTeacher
 description: A fun activity for learning Git and GitHub.
 
+# Optimized SASS compilation
 sass:
-  style:     :compressed
+  style: :compressed
+  sass_dir: _sass
+  sourcemap: never
+
+# Asset optimization
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false
 
 ## solarized variant (dark/light)
 solarized:
@@ -81,7 +106,7 @@ reveal:
   ## Transition style (default/cube/page/concave/zoom/linear/fade/none)
   transition: linear
   ## Transition speed (default/fast/slow)
-  #transitionSpeed: default
+  transitionSpeed: fast
   ## Transition style for full page slide backgrounds (default/none/slide/concave/convex/zoom)
   backgroundTransition: slide
   ## Number of slides away from the current that are visible
@@ -112,5 +137,9 @@ exclude: [
   "reveal.js/Gruntfile.js",
   "reveal.js/CONTRIBUTING.md",
   "reveal.js/LICENSE",
-  "reveal.js/package.json"
+  "reveal.js/package.json",
+  "node_modules",
+  "*.log",
+  ".git",
+  ".gitignore"
 ]

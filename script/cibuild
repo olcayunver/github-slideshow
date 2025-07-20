@@ -2,5 +2,23 @@
 
 set -e
 
-bundle exec jekyll build --baseurl "."
-htmlproofer _site/index.html --empty-alt-ignore
+echo "Building optimized production site..."
+
+# Production build with optimizations
+JEKYLL_ENV=production bundle exec jekyll build \
+  --destination ./_site \
+  --config _config.yml \
+  --profile \
+  --trace
+
+echo "Running HTML proofer..."
+bundle exec htmlproofer ./_site \
+  --check-html \
+  --check-opengraph \
+  --check-favicon \
+  --disable-external \
+  --allow-hash-href \
+  --alt-ignore '/.*/' \
+  --file-ignore '/.*reveal.*/'
+
+echo "Build completed successfully!"

@@ -1,0 +1,75 @@
+#!/bin/sh
+
+set -e
+
+echo "🔍 Checking slideshow optimizations..."
+
+cd "$(dirname "$0")/.."
+
+# Check if optimization files exist
+echo "==> Checking optimization files..."
+
+if [ -f "sw.js" ]; then
+  echo "✓ Service worker found"
+else
+  echo "✗ Service worker missing"
+fi
+
+if grep -q "preload" _includes/head.html; then
+  echo "✓ Resource preloading enabled"
+else
+  echo "✗ Resource preloading not found"
+fi
+
+if grep -q "compress_html" _config.yml; then
+  echo "✓ HTML compression configured"
+else
+  echo "✗ HTML compression not configured"
+fi
+
+if grep -q "incremental: true" _config.yml; then
+  echo "✓ Incremental builds enabled"
+else
+  echo "✗ Incremental builds not enabled"
+fi
+
+# Check reveal.js configuration
+echo ""
+echo "==> Checking Reveal.js optimizations..."
+
+if grep -q "condition:" _includes/script.html; then
+  echo "✓ Conditional plugin loading enabled"
+else
+  echo "✗ Conditional plugin loading not found"
+fi
+
+if grep -q "transitionSpeed.*fast" _config.yml; then
+  echo "✓ Fast transitions configured"
+else
+  echo "✗ Fast transitions not configured"
+fi
+
+# Check build scripts
+echo ""
+echo "==> Checking build scripts..."
+
+if grep -q "JEKYLL_ENV=production" script/cibuild; then
+  echo "✓ Production environment in CI build"
+else
+  echo "✗ Production environment not set in CI build"
+fi
+
+if grep -q "livereload" script/server; then
+  echo "✓ Live reload enabled for development"
+else
+  echo "✗ Live reload not enabled for development"
+fi
+
+echo ""
+echo "🎯 Optimization check complete!"
+echo ""
+echo "Performance tips:"
+echo "  • Use 'bundle exec jekyll serve --profile' to analyze build performance"
+echo "  • Check browser Network tab for resource loading efficiency"
+echo "  • Test offline functionality with service worker"
+echo "  • Monitor Core Web Vitals in production"

@@ -1,7 +1,18 @@
 <!DOCTYPE html>
-<html class="{% if site.solarized.theme %}{{site.solarized.theme}}{% else %}dark{% endif %}">
+<html class="{% if site.solarized.theme %}{{site.solarized.theme}}{% else %}dark{% endif %}" lang="en">
 <head>
+  <!-- Performance optimizations -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+  
   {% include head.html %}
+  
+  <!-- Performance monitoring -->
+  <script>
+    if (window.performance && window.performance.mark) {
+      window.performance.mark('head-loaded');
+    }
+  </script>
 </head>
 <body>
 	<div class="reveal">
@@ -9,7 +20,48 @@
 			{{ content }}
 		</div>
 	</div>
+	
+	<!-- Loading indicator for better UX -->
+	<div id="loading-indicator" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; display: none;">
+		<div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+	</div>
+	
+	<style>
+		@keyframes spin {
+			0% { transform: translate(-50%, -50%) rotate(0deg); }
+			100% { transform: translate(-50%, -50%) rotate(360deg); }
+		}
+		
+		/* Critical CSS for faster initial render */
+		.reveal { visibility: hidden; }
+		.reveal.loaded { visibility: visible; }
+	</style>
+	
 	{% include script.html %}
+	
+	<script>
+		// Show loading indicator and hide when reveal is ready
+		document.addEventListener('DOMContentLoaded', function() {
+			var loadingIndicator = document.getElementById('loading-indicator');
+			var reveal = document.querySelector('.reveal');
+			
+			loadingIndicator.style.display = 'block';
+			
+			// Hide loading when reveal is initialized
+			if (typeof Reveal !== 'undefined') {
+				Reveal.addEventListener('ready', function() {
+					loadingIndicator.style.display = 'none';
+					reveal.classList.add('loaded');
+				});
+			} else {
+				// Fallback if Reveal doesn't load
+				setTimeout(function() {
+					loadingIndicator.style.display = 'none';
+					reveal.classList.add('loaded');
+				}, 3000);
+			}
+		});
+	</script>
 </body>
 </html>
 

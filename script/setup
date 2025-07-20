@@ -2,8 +2,11 @@
 
 set -e
 
+echo "🚀 Setting up optimized Jekyll slideshow..."
+
 cd "$(dirname "$0")/.."
 
+# Check for Homebrew dependencies on macOS
 if [ -f "Brewfile" ] && [ "$(uname -s)" = "Darwin" ]; then
   brew bundle check >/dev/null 2>&1  || {
     echo "==> Installing Homebrew dependencies…"
@@ -11,6 +14,7 @@ if [ -f "Brewfile" ] && [ "$(uname -s)" = "Darwin" ]; then
   }
 fi
 
+# Ruby version management
 if [ -f ".ruby-version" ] && [ -z "$(rbenv version-name 2>/dev/null)" ]; then
   echo "==> Installing Ruby…"
   rbenv install --skip-existing
@@ -20,11 +24,33 @@ if [ -f ".ruby-version" ] && [ -z "$(rbenv version-name 2>/dev/null)" ]; then
   }
 fi
 
+# Install Ruby dependencies with optimizations
 if [ -f "Gemfile" ]; then
-  echo "==> Installing gem dependencies…"
-  bundle install --no-cache --quiet --without production
+  echo "==> Installing optimized gem dependencies…"
+  bundle install --no-cache --quiet --without production --jobs=4
 fi
 
-git submodule update --init
+# Initialize git submodules
+echo "==> Updating git submodules…"
+git submodule update --init --recursive
 
-echo "==> App is now ready to go!"
+# Verify reveal.js is available
+if [ ! -d "node_modules/reveal.js" ]; then
+  echo "⚠️  Warning: reveal.js not found in node_modules"
+  echo "   Make sure to run 'npm install' or equivalent to install reveal.js"
+fi
+
+# Performance check
+echo "==> Running performance check…"
+if command -v node >/dev/null 2>&1; then
+  echo "✓ Node.js available for potential build optimizations"
+else
+  echo "⚠️  Node.js not found - some optimizations may not be available"
+fi
+
+echo "✅ App is now ready to go with performance optimizations!"
+echo ""
+echo "Next steps:"
+echo "  • Run './script/server' to start the development server"
+echo "  • Run './script/cibuild' to build for production"
+echo "  • Check browser dev tools for performance metrics"
